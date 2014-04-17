@@ -1,6 +1,7 @@
 package ru.magnat.android.service.openvpn.client;
 
-import ru.magnat.android.service.openvpn.aidl.IOpenVpnService_External;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,23 +13,26 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import de.blinkt.openvpn.api.APIVpnProfile;
+import de.blinkt.openvpn.api.IOpenVPNAPIService;
 
 public class MainActivity extends Activity {
 	
-	private IOpenVpnService_External mOpenVpnService_External;
+	@SuppressWarnings("unused")
+	private IOpenVPNAPIService mOpenVPNAPIService;
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
 		
 	    public void onServiceConnected(ComponentName className, IBinder service) {
 	    	Log.d("", "Connected to external service");
 	    	
-	    	mOpenVpnService_External = IOpenVpnService_External.Stub.asInterface(service);
+	    	mOpenVPNAPIService = IOpenVPNAPIService.Stub.asInterface(service);
 	    }
 
 	    public void onServiceDisconnected(ComponentName className) {
 	    	Log.d("", "Disconnected from external service");
 	    	
-	    	mOpenVpnService_External = null;
+	    	mOpenVPNAPIService = null;
 	    }
 	    
 	};
@@ -37,7 +41,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		bindService(new Intent("ru.magnat.android.service.openvpn.OpenVpnService_External"), mConnection, Context.BIND_AUTO_CREATE);
+		bindService(new Intent("de.blinkt.openvpn.api.IOpenVPNAPIService"), mConnection, Context.BIND_AUTO_CREATE);
 	}
 	
 	@Override
@@ -50,18 +54,30 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		
-		MenuItem item = menu.add(R.string.test);
-		item.setIcon(android.R.drawable.ic_media_play);
-		item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		MenuItem item1 = menu.add(R.string.connect);
+		item1.setIcon(android.R.drawable.ic_media_play);
+		item1.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+		MenuItem item2 = menu.add(R.string.disconnect);
+		item2.setIcon(android.R.drawable.ic_media_rew);
+		item2.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		
 		return super.onCreateOptionsMenu(menu);
 	}
 	
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		if (item.getTitle().equals(getResources().getString(R.string.test))) {
+		if (item.getTitle().equals(getResources().getString(R.string.connect))) {
 			try {
-				mOpenVpnService_External.test();
+				List<APIVpnProfile> profiles = mOpenVPNAPIService.getProfiles();
+				mOpenVPNAPIService.startProfile(profiles.get(0).mUUID); 
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}	
+		if (item.getTitle().equals(getResources().getString(R.string.disconnect))) {
+			try {
+				mOpenVPNAPIService.disconnect();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}

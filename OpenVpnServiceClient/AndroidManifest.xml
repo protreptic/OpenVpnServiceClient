@@ -8,6 +8,7 @@
         android:targetSdkVersion="19" />
     
     <uses-permission android:name="magnat.android.permission.OPENVPN_SERVICE"/>
+    <uses-permission android:name="de.blinkt.openvpn.REMOTE_API"/>
     
     <application
         android:allowBackup="true"
