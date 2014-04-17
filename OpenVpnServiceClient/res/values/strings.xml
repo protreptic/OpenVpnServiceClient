@@ -1,5 +1,5 @@
 <resources>
 
     <string name="app_name">OpenVpnServiceClient</string>
-
+	<string name="test">Test</string>
 </resources>
