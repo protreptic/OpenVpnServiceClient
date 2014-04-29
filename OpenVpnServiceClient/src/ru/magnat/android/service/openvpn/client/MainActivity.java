@@ -18,7 +18,6 @@ import de.blinkt.openvpn.api.IOpenVPNAPIService;
 
 public class MainActivity extends Activity {
 	
-	@SuppressWarnings("unused")
 	private IOpenVPNAPIService mOpenVPNAPIService;
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
